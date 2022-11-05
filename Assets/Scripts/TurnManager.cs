@@ -1,10 +1,13 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems; // 1
 
-public class ButtonFunctions : MonoBehaviour
+public class TurnManager : MonoBehaviour
 {
-    int n;
-    int m;
+    public bool isPlayerTurn = false;
+    public bool isEnemyTurn = false;
+    public bool isBattleFinished = false;
+
     GameObject rubyObject;
     RubyController rubyController;
 
@@ -19,14 +22,15 @@ public class ButtonFunctions : MonoBehaviour
         botObject = GameObject.Find("bot");
         botController = botObject.GetComponent<BotController>();
     }
-    
-    public void ChangePlayerHP()
+
+    void Start()
     {
-        botController.AttackPlayer();
+        isEnemyTurn = true;
     }
 
-    public void ChangeEnemyHP()
+
+    void Update()
     {
-        rubyController.AttackEnemy();
+        
     }
 }
