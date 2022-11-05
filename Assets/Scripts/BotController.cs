@@ -1,12 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 public class BotController : MonoBehaviour
 {
-    Rigidbody2D rigidbody2d;
-    
     int maxHealth = 30;
     int currentHealth;
 
@@ -37,16 +33,13 @@ public class BotController : MonoBehaviour
         rubyController = rubyObject.GetComponent<RubyController>();
     }
 
-    // Start is called before the first frame update
     void Start()
     {
-        rigidbody2d = GetComponent<Rigidbody2D>();
         currentHealth = maxHealth;
         restingPosition = transform.position;
         targetPosition = restingPosition;
     }
 
-    // Update is called once per frame
     void Update()
     {
         hp.text = $"{currentHealth}/{maxHealth}";
@@ -54,13 +47,6 @@ public class BotController : MonoBehaviour
 
     void FixedUpdate()
     {
-        /*float moveAmount = .25f;
-        Vector2 currentPosition = transform.position;
-        Vector2 newPosition = currentPosition + (rubyController.restingPosition * moveAmount);
-        rigidbody2d.MovePosition(newPosition);*/
-
-        /*transform.position = Vector2.Lerp(transform.position, targetPosition, Time.fixedDeltaTime);*/
-
         Vector2 currentPosition = transform.position;
         float step = 10.0f * Time.fixedDeltaTime;
         transform.position = Vector2.MoveTowards(currentPosition, targetPosition, step);
