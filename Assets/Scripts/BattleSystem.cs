@@ -1,6 +1,7 @@
 using System.Collections;
-using Unity.VisualScripting;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST }
 
@@ -18,6 +19,12 @@ public class BattleSystem : MonoBehaviour
     GameObject enemyHUDObject;
     UnitHUD enemyHUD;
 
+    GameObject battleMsgObject;
+    TextMeshProUGUI msgText;
+
+    GameObject battleOverSummaryObject;
+    TextMeshProUGUI summaryText;
+
     public BattleState state;
 
     private void Awake()
@@ -33,23 +40,35 @@ public class BattleSystem : MonoBehaviour
 
         enemyHUDObject = GameObject.Find("EnemyHUD");
         enemyHUD = enemyHUDObject.GetComponent<UnitHUD>();
+
+        battleMsgObject = GameObject.Find("BattleMessages");
+        msgText = battleMsgObject.GetComponent<TextMeshProUGUI>();
+
+        battleOverSummaryObject = GameObject.Find("BattleOverSummary");
+        summaryText = GameObject.Find("SummaryText").GetComponent<TextMeshProUGUI>();
     }
 
     private void Start()
     {
+        ClearBattleMessage();
+
+        summaryText.text = "";
+        battleOverSummaryObject.SetActive(false);
+
         state = BattleState.START;
         StartCoroutine(SetupBattle());
     }
 
     IEnumerator SetupBattle()
     {
-        // have battle message display that says 'start battle'
-        print("start battle");
+        SetBattleMessage("Start Battle");
 
         playerHUD.SetHUD(player);
         enemyHUD.SetHUD(enemy);
 
         yield return new WaitForSeconds(2f);
+
+        ClearBattleMessage();
 
         state = BattleState.ENEMYTURN;
         StartCoroutine(EnemyTurn());
@@ -57,11 +76,12 @@ public class BattleSystem : MonoBehaviour
 
     IEnumerator EnemyTurn()
     {
-        //battle message 'enemy attacks'
-        print("enemy attacks");
+        SetBattleMessage("Enemy attacks!");
         enemy.SetMovementTarget(player.restingPosition);
 
         yield return new WaitForSeconds(1f);
+
+        ClearBattleMessage();
 
         bool playerDied = player.TakeDamage(enemy.attack);
         playerHUD.SetHP(player);
@@ -82,8 +102,7 @@ public class BattleSystem : MonoBehaviour
 
     void PlayerTurn()
     {
-        // battle message 'your turn'
-        print("your turn");
+        SetBattleMessage("Your turn");
 
         // light up action buttons (they should be dimmed/greyed out when not player turn)
     }
@@ -96,6 +115,7 @@ public class BattleSystem : MonoBehaviour
         }
         else
         {
+            ClearBattleMessage();
             StartCoroutine(PlayerAttack());
         }
     }
@@ -108,17 +128,19 @@ public class BattleSystem : MonoBehaviour
         }
         else
         {
+            ClearBattleMessage();
             StartCoroutine(PlayerHeal());
         }
     }
 
     IEnumerator PlayerAttack()
     {
-        //battle message like 'attack' or 'slash' or 'stab'
-        print("stab");
+        SetBattleMessage("stab!");
         player.SetMovementTarget(enemy.restingPosition);
 
         yield return new WaitForSeconds(1f);
+
+        ClearBattleMessage();
 
         bool enemyDied = enemy.TakeDamage(player.attack);
         enemyHUD.SetHP(enemy);
@@ -139,12 +161,13 @@ public class BattleSystem : MonoBehaviour
 
     IEnumerator PlayerHeal()
     {
-        //battle message '++{healAmt}HP'
-        print($"++ {10}HP");
+        SetBattleMessage("++10HP");
         player.Heal(10);
         playerHUD.SetHP(player);
 
         yield return new WaitForSeconds(1f);
+
+        ClearBattleMessage();
 
         state = BattleState.ENEMYTURN;
         StartCoroutine(EnemyTurn());
@@ -152,18 +175,27 @@ public class BattleSystem : MonoBehaviour
 
     void EndBattle()
     {
-        // display battle over dialogue box
-        print("battle over");
-
         if(state == BattleState.WON)
         {
-            //set battle over text to 'you won'
-            print("you won");
+            summaryText.text = "You won!";
         }
         else if(state == BattleState.LOST)
         {
-            //set battle over text to 'you lost'
-            print("you lost");
+            summaryText.text = "You lost..";
         }
+
+        battleOverSummaryObject.SetActive(true);
+    }
+
+    void SetBattleMessage(string msg)
+    {
+        msgText.text = msg;
+        battleMsgObject.SetActive(true);
+    }
+
+    void ClearBattleMessage()
+    {
+        msgText.text = "";
+        battleMsgObject.SetActive(false);
     }
 }
