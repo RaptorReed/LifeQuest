@@ -3,30 +3,50 @@ using UnityEngine.EventSystems; // 1
 
 public class ButtonFunctions : MonoBehaviour
 {
-    int n;
-    int m;
-    GameObject rubyObject;
-    RubyController rubyController;
+    GameObject playerObject;
+    Unit player;
 
-    GameObject botObject;
-    BotController botController;
+    GameObject enemyObject;
+    Unit enemy;
+
+    GameObject playerHUDObject;
+    UnitHUD playerHUD;
+
+    GameObject enemyHUDObject;
+    UnitHUD enemyHUD;
 
     private void Awake()
     {
-        rubyObject = GameObject.Find("ruby");
-        rubyController = rubyObject.GetComponent<RubyController>();
+        playerObject = GameObject.Find("Player");
+        player = playerObject.GetComponent<Unit>();
 
-        botObject = GameObject.Find("bot");
-        botController = botObject.GetComponent<BotController>();
+        enemyObject = GameObject.Find("Enemy");
+        enemy = enemyObject.GetComponent<Unit>();
+
+        playerHUDObject = GameObject.Find("PlayerHUD");
+        playerHUD = playerHUDObject.GetComponent<UnitHUD>();
+
+        enemyHUDObject = GameObject.Find("EnemyHUD");
+        enemyHUD = enemyHUDObject.GetComponent<UnitHUD>();
     }
     
-    public void ChangePlayerHP()
+    public void SetUpHUDs()
     {
-        botController.AttackPlayer();
+        playerHUD.SetHUD(player);
+        enemyHUD.SetHUD(enemy);
     }
 
-    public void ChangeEnemyHP()
+    public void PlayerAttack()
     {
-        rubyController.AttackEnemy();
+        player.SetMovementTarget(enemy.restingPosition);
+        enemy.TakeDamage(player.attack);
+        enemyHUD.SetHP(enemy);
+    }
+
+    public void EnemyAttack()
+    {
+        enemy.SetMovementTarget(player.restingPosition);
+        player.TakeDamage(enemy.attack);
+        playerHUD.SetHP(player);
     }
 }
