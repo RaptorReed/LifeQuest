@@ -29,7 +29,7 @@ public class BattleSystem : MonoBehaviour
 
     private void Awake()
     {
-        playerObject = GameObject.Find("Player");
+        playerObject = GameObject.Find("DefaultChar");
         player = playerObject.GetComponent<Unit>();
 
         enemyObject = GameObject.Find("Enemy");
