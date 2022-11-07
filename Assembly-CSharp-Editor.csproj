@@ -54,15 +54,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
+    <Analyzer Include="C:\Users\ryker\workspace\LifeQuest\Assets\Art\CharacterParts\Common\Editor\HeroEditor.Common.Editor.dll" />
+    <Analyzer Include="C:\Users\ryker\workspace\LifeQuest\Assets\Art\CharacterParts\Common\HeroEditor.Common.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Common\Editor\SpriteCollectionEditor.cs" />
-    <Compile Include="Assets\Common\Editor\FirearmCollectionEditor.cs" />
-    <Compile Include="Assets\Common\Editor\IconCollectionEditor.cs" />
-    <Compile Include="Assets\Common\Editor\LayerManagerEditor.cs" />
+    <Compile Include="Assets\Art\CharacterParts\Common\Editor\SpriteCollectionEditor.cs" />
+    <Compile Include="Assets\Art\CharacterParts\Common\Editor\FirearmCollectionEditor.cs" />
+    <Compile Include="Assets\Art\CharacterParts\Common\Editor\IconCollectionEditor.cs" />
+    <Compile Include="Assets\Art\CharacterParts\Common\Editor\LayerManagerEditor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Common\Editor\HeroEditor.Common.Editor.dll" />
+    <None Include="Assets\Art\CharacterParts\Common\Editor\HeroEditor.Common.Editor.dll" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -375,10 +377,10 @@
       <HintPath>Library\PackageCache\com.unity.collab-proxy@1.17.2\Lib\Editor\PlasticSCM\unityplastic.dll</HintPath>
     </Reference>
     <Reference Include="HeroEditor.Common">
-      <HintPath>Assets\Common\HeroEditor.Common.dll</HintPath>
+      <HintPath>Assets\Art\CharacterParts\Common\HeroEditor.Common.dll</HintPath>
     </Reference>
     <Reference Include="HeroEditor.Common.Editor">
-      <HintPath>Assets\Common\Editor\HeroEditor.Common.Editor.dll</HintPath>
+      <HintPath>Assets\Art\CharacterParts\Common\Editor\HeroEditor.Common.Editor.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>Library\PackageCache\com.unity.ext.nunit@1.0.6\net35\unity-custom\nunit.framework.dll</HintPath>

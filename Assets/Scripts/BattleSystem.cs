@@ -2,6 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Assets.HeroEditor.Common.CharacterScripts;
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST }
 
@@ -9,6 +10,7 @@ public class BattleSystem : MonoBehaviour
 {
     GameObject playerObject;
     Unit player;
+    Character playerCharacter;
 
     GameObject enemyObject;
     Unit enemy;
@@ -25,12 +27,28 @@ public class BattleSystem : MonoBehaviour
     GameObject battleOverSummaryObject;
     TextMeshProUGUI summaryText;
 
+    GameObject startBattleTextObject;
+    ParticleSystem startBattleTextParticleSystem;
+
+    GameObject enemyTurnTextObject;
+    ParticleSystem enemyTurnTextParticleSystem;
+
+    GameObject yourTurnTextObject;
+    ParticleSystem yourTurnTextParticleSystem;
+
+    GameObject victoryTextObject;
+    ParticleSystem victoryTextParticleSystem;
+
+    GameObject defeatTextObject;
+    ParticleSystem defeatTextParticleSystem;
+
     public BattleState state;
 
     private void Awake()
     {
         playerObject = GameObject.Find("DefaultChar");
         player = playerObject.GetComponent<Unit>();
+        playerCharacter = playerObject.GetComponent<Character>();
 
         enemyObject = GameObject.Find("Enemy");
         enemy = enemyObject.GetComponent<Unit>();
@@ -41,19 +59,29 @@ public class BattleSystem : MonoBehaviour
         enemyHUDObject = GameObject.Find("EnemyHUD");
         enemyHUD = enemyHUDObject.GetComponent<UnitHUD>();
 
-        battleMsgObject = GameObject.Find("BattleMessages");
-        msgText = battleMsgObject.GetComponent<TextMeshProUGUI>();
+        /*battleOverSummaryObject = GameObject.Find("BattleOverSummary");
+        summaryText = GameObject.Find("SummaryText").GetComponent<TextMeshProUGUI>();*/
 
-        battleOverSummaryObject = GameObject.Find("BattleOverSummary");
-        summaryText = GameObject.Find("SummaryText").GetComponent<TextMeshProUGUI>();
+        startBattleTextObject = GameObject.Find("StartBattle");
+        startBattleTextParticleSystem = startBattleTextObject.GetComponent<ParticleSystem>();
+
+        enemyTurnTextObject = GameObject.Find("EnemyTurn");
+        enemyTurnTextParticleSystem = enemyTurnTextObject.GetComponent<ParticleSystem>();
+
+        yourTurnTextObject = GameObject.Find("YourTurn");
+        yourTurnTextParticleSystem = yourTurnTextObject.GetComponent<ParticleSystem>();
+
+        victoryTextObject = GameObject.Find("Victory");
+        victoryTextParticleSystem = victoryTextObject.GetComponent<ParticleSystem>();
+
+        defeatTextObject = GameObject.Find("Defeat");
+        defeatTextParticleSystem = defeatTextObject.GetComponent<ParticleSystem>();
     }
 
     private void Start()
     {
-        ClearBattleMessage();
-
-        summaryText.text = "";
-        battleOverSummaryObject.SetActive(false);
+        /*summaryText.text = "";
+        battleOverSummaryObject.SetActive(false);*/
 
         state = BattleState.START;
         StartCoroutine(SetupBattle());
@@ -61,14 +89,12 @@ public class BattleSystem : MonoBehaviour
 
     IEnumerator SetupBattle()
     {
-        SetBattleMessage("Start Battle");
+        startBattleTextParticleSystem.Play();
 
         playerHUD.SetHUD(player);
         enemyHUD.SetHUD(enemy);
 
-        yield return new WaitForSeconds(2f);
-
-        ClearBattleMessage();
+        yield return new WaitForSeconds(2.5f);
 
         state = BattleState.ENEMYTURN;
         StartCoroutine(EnemyTurn());
@@ -76,12 +102,15 @@ public class BattleSystem : MonoBehaviour
 
     IEnumerator EnemyTurn()
     {
-        SetBattleMessage("Enemy attacks!");
+        enemyTurnTextParticleSystem.Play();
+
+        yield return new WaitForSeconds(.5f);
+
         enemy.SetMovementTarget(player.restingPosition);
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(.5f);
 
-        ClearBattleMessage();
+        playerCharacter.GetHit();
 
         bool playerDied = player.TakeDamage(enemy.attack);
         playerHUD.SetHP(player);
@@ -91,7 +120,7 @@ public class BattleSystem : MonoBehaviour
         if(playerDied)
         {
             state = BattleState.LOST;
-            EndBattle();
+            StartCoroutine(EndBattle());
         }
         else
         {
@@ -102,7 +131,7 @@ public class BattleSystem : MonoBehaviour
 
     void PlayerTurn()
     {
-        SetBattleMessage("Your turn");
+        yourTurnTextParticleSystem.Play();
 
         // light up action buttons (they should be dimmed/greyed out when not player turn)
     }
@@ -115,7 +144,6 @@ public class BattleSystem : MonoBehaviour
         }
         else
         {
-            ClearBattleMessage();
             StartCoroutine(PlayerAttack());
         }
     }
@@ -128,19 +156,17 @@ public class BattleSystem : MonoBehaviour
         }
         else
         {
-            ClearBattleMessage();
             StartCoroutine(PlayerHeal());
         }
     }
 
     IEnumerator PlayerAttack()
     {
-        SetBattleMessage("stab!");
         player.SetMovementTarget(enemy.restingPosition);
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(.25f);
 
-        ClearBattleMessage();
+        playerCharacter.Slash();
 
         bool enemyDied = enemy.TakeDamage(player.attack);
         enemyHUD.SetHP(enemy);
@@ -149,8 +175,10 @@ public class BattleSystem : MonoBehaviour
 
         if (enemyDied)
         {
+            yield return new WaitForSeconds(1.5f);
+
             state = BattleState.WON;
-            EndBattle();
+            StartCoroutine(EndBattle());
         }
         else
         {
@@ -161,41 +189,36 @@ public class BattleSystem : MonoBehaviour
 
     IEnumerator PlayerHeal()
     {
-        SetBattleMessage("++10HP");
         player.Heal(10);
         playerHUD.SetHP(player);
 
         yield return new WaitForSeconds(1f);
 
-        ClearBattleMessage();
-
         state = BattleState.ENEMYTURN;
         StartCoroutine(EnemyTurn());
     }
 
-    void EndBattle()
+    IEnumerator EndBattle()
     {
+        /*textEffectParticleSystem.Play();*/
+
         if(state == BattleState.WON)
         {
-            summaryText.text = "You won!";
+            playerCharacter.Victory();
+
+            yield return new WaitForSeconds(.15f);
+
+            victoryTextParticleSystem.Play();
         }
         else if(state == BattleState.LOST)
         {
-            summaryText.text = "You lost..";
+            playerCharacter.DieBackward();
+
+            yield return new WaitForSeconds(1f);
+
+            defeatTextParticleSystem.Play();
         }
 
-        battleOverSummaryObject.SetActive(true);
-    }
-
-    void SetBattleMessage(string msg)
-    {
-        msgText.text = msg;
-        battleMsgObject.SetActive(true);
-    }
-
-    void ClearBattleMessage()
-    {
-        msgText.text = "";
-        battleMsgObject.SetActive(false);
+        /*battleOverSummaryObject.SetActive(true);*/
     }
 }
